@@ -1,0 +1,23 @@
+name: Attach verified Mac installers
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/attach-macos-installers.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  attach:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify native packages and publish tester downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ROOMMATCH_TRANSFER_ARM64_URL: ${{ secrets.ROOMMATCH_TRANSFER_ARM64_URL }}
+          ROOMMATCH_TRANSFER_X64_URL: ${{ secrets.ROOMMATCH_TRANSFER_X64_URL }}
+        run: python -u tools/attach_macos_installers.py
